@@ -10,7 +10,7 @@
 
 #define BUFF_SIZE 4000
 
-#define ENDPOINT "http://192.168.1.205:8080/test"
+#define ENDPOINT "http://172.23.0.130:8080/test"
 
 const char* ssid = "Danzi'sPixel";      // WiFi SSID
 const char* password = "RocketGoWoosh"; // Password
@@ -46,6 +46,10 @@ void blinkVal(int val){
     blinkN(tens);
     delay(500);
     blinkN(ones);
+}
+
+void getTime(){
+
 }
 
 void setup() {

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<!-- <script src = "sketch.js"></script> -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<body>
+
+<div id="myPlot" style="width:100%;max-width:700px"></div>
+<select id="saves"></select>
+
+<script>
+
+// Define Data
+const chart_data = [{
+    x:[],
+    y:[],
+    mode:"markers"
+}];
+
+// Define Layout
+const chart_layout = {
+    xaxis: {title: "Time"},
+    yaxis: {title: "Height"},  
+    title: "Rocket yeet height"
+};
+
+
+function getSavefiles(){
+    fetch('/savefiles')
+        .then(response => {
+            if (!response.ok) throw new Error("HTTP error " + response.status)
+            return response.json()
+        }).then(json => {
+            let select = document.getElementById("saves")
+            while (select.firstChild) {
+                select.removeChild(select.firstChild);
+            }
+            for(let save of json){
+                let option = document.createElement("option")
+                option.value = save
+                option.text = save
+                select.append(option)
+            }
+            if (select.options.length > 0) {
+                select.selectedIndex = 0;
+            }
+        }).catch(err => console.error("Failed to get list of save files: ", err))
+}
+
+function getSaveData(filename){
+    fetch('/saves/'+filename)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            return response.json();
+        })
+        .then(json => {
+            Plotly.update("myPlot", {'x': [json.time_ms], 'y': [json.altitude]}, {});
+        })
+        .catch(err => console.log("An error occurred while fetching the save data."))
+}
+
+window.onload = function(){
+    // Get the list of savefiles
+    getSavefiles()
+
+    let select = document.getElementById("saves");
+    select.addEventListener("change", function (){getSaveData(this.value)});
+
+    // Display using Plotly
+    Plotly.newPlot("myPlot", [chart_data], chart_layout);
+}
+</script>
+
+</body>
+</html>
